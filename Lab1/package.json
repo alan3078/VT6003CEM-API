@@ -16,6 +16,7 @@
     },
     "devDependencies": {
         "@types/node": "^20.10.6",
+        "@types/sentiment": "^5.0.4",
         "ts-node": "^10.9.2",
         "tsx": "^3.12.7"
     }
