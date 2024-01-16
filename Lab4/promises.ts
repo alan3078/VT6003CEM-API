@@ -7,8 +7,15 @@ const key = FIXER_API_KEY;
 
 const getInput = (question: string) =>
   new Promise<string>((resolve) => {
-    const convertTo = readline.question(question);
-    resolve(convertTo);
+    const convertTo: string = readline.question(question);
+    resolve(convertTo.toUpperCase());
+  });
+
+const getAmount = (question: string) =>
+  new Promise<number>((resolve) => {
+    const amount: string = readline.question(question);
+    const amountNum = Number(amount);
+    resolve(amountNum);
   });
 
 const checkValidCurrencyCode = (code: string) => {
@@ -34,8 +41,9 @@ const checkValidCurrencyCode = (code: string) => {
   });
 };
 
-const getData = (code: string) => {
+const getData = (code: string, amount: number) => {
   console.log('Retrieving the rate...');
+  console.log({code, amount});
   return new Promise((resolve, reject) => {
     axios
       .get(`${url}/latest?base=HKD&symbols=${code}`, {
@@ -45,7 +53,10 @@ const getData = (code: string) => {
       })
       .then(({ data, status }) => {
         if (status === 200) {
-          resolve(data);
+          const rate = Number(Object.values(data.rates)[0]);
+          const convertedAmount = (rate * amount).toFixed(2);
+          console.log(convertedAmount);
+          resolve(convertedAmount);
         } else {
           reject('Connection Error');
         }
@@ -60,7 +71,7 @@ const printObject = (data: any) =>
   new Promise<any>((resolve) => {
     const indent = 2;
     const str = JSON.stringify(data, null, indent);
-    console.log(str);
+    console.log(Object.values(data.rates)[0]);
     resolve(null);
   });
 
@@ -71,7 +82,7 @@ const exit = () =>
 
 getInput('enter currency: ')
   .then(checkValidCurrencyCode)
-  .then(getData)
+  .then((code) => getAmount('enter amount: ').then((amount) => getData(code, amount)))
   .then(printObject)
   .then(exit)
   .catch((err) => console.error(`error: ${err.message}`))
