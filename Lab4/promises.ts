@@ -1,9 +1,9 @@
 import axios from 'axios';
 import * as readline from 'readline-sync';
-import { API_KEY } from './env';
+import { FIXER_API_KEY } from './env';
 
 const url = 'https://api.apilayer.com/fixer';
-const key = API_KEY;
+const key = FIXER_API_KEY;
 
 const getInput = (question: string) =>
   new Promise<string>((resolve) => {

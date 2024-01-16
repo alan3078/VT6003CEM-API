@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_KEY } from './env';
+import { FIXER_API_KEY } from './env';
 
 type CurrencyResponse = {
   success: boolean;
@@ -16,7 +16,7 @@ const exchange = async (baseSymbol: string, symbol: string) => {
   const options = {
     url: url,
     headers: {
-      apikey: API_KEY,
+      apikey: FIXER_API_KEY,
     },
   };
   try {
@@ -32,25 +32,21 @@ const exchange = async (baseSymbol: string, symbol: string) => {
   }
 };
 
-try {
-  if (process.argv.length < 3) {
-    throw 'missing parameter';
-  } else {
-    const baseSymbol = process.argv[2].toUpperCase();
-    const symbol = process.argv[3].toUpperCase();
-    exchange(baseSymbol, symbol).then((data: CurrencyResponse) => {
-      if (data.success === false)
-        throw new Error(`invalid base code ${baseSymbol} with currency code ${symbol}`);
+if (process.argv.length < 3) {
+  throw 'missing parameter';
+} else {
+  const baseSymbol = process.argv[2].toUpperCase();
+  const symbol = process.argv[3].toUpperCase();
+  exchange(baseSymbol, symbol).then((data: CurrencyResponse) => {
+    if (data.success === false)
+      throw new Error(`invalid base code ${baseSymbol} with currency code ${symbol}`);
 
-      const rates = {
-        [symbol]: data.rates[symbol].toFixed(2),
-      };
+    const rates = {
+      [symbol]: data.rates[symbol].toFixed(2),
+    };
 
-      const result = { ...data, rates };
+    const result = { ...data, rates };
 
-      console.log(result);
-    });
-  }
-} catch (err: any) {
-  console.log(`${err} Usage: currency [toSymbols]`);
+    console.log(`1 ${baseSymbol} = ${result.rates[symbol]} ${symbol}`);
+  });
 }
