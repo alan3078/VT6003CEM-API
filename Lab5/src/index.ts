@@ -4,6 +4,7 @@ import logger from 'koa-logger';
 import json from 'koa-json';
 import bodyParser from 'koa-bodyparser';
 import { CustomErrorMessageFunction, query, body, validationResults } from 'koa-req-validation';
+import { router as articlesRouter } from '../routes/articles';
 
 const app: Koa = new Koa();
 const router: Router = new Router();
@@ -25,9 +26,21 @@ const custom404 = async (ctx: RouterContext, next: any) => {
   }
 };
 
+const welcomeAPI = async (ctx: RouterContext, next: any) => {
+  ctx.body = {
+    msg: 'Welcome to the API',
+  }
+
+  await next();
+}
+
+router.get('/api/v1', welcomeAPI);
+
+
 app.use(json());
 app.use(logger());
 app.use(bodyParser());
+app.use(articlesRouter.routes())
 app.use(router.routes()).use(router.allowedMethods());
 
 const customErrorMessage: CustomErrorMessageFunction = (_ctx: RouterContext, value: string) => {
