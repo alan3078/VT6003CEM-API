@@ -40,7 +40,7 @@ router.get('/api/v1', welcomeAPI);
 app.use(json());
 app.use(logger());
 app.use(bodyParser());
-app.use(articlesRouter.routes())
+app.use(articlesRouter.routes()).use(articlesRouter.allowedMethods());
 app.use(router.routes()).use(router.allowedMethods());
 
 const customErrorMessage: CustomErrorMessageFunction = (_ctx: RouterContext, value: string) => {

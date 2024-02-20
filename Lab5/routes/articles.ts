@@ -38,6 +38,7 @@ const createArticle = async (ctx: RouterContext, next: any) => {
   const newArticle = { id: articles.length + 1, title, fullText };
   articles.push(newArticle);
 
+  ctx.status = 201;
   ctx.body = articles;
   await next();
 };
@@ -55,6 +56,8 @@ const updateArticle = async (ctx: RouterContext, next: any) => {
     ctx.status = 404;
     ctx.body = { err: 'No such article existed' };
   }
+
+  await next();
 };
 
 const deleteArticle = async (ctx: RouterContext, next: any) => {
@@ -70,9 +73,9 @@ const deleteArticle = async (ctx: RouterContext, next: any) => {
 };
 
 router.get('/', getAll);
-router.get('/:id[0-9]{1,}', getById);
+router.get('/:id([0-9]{1,})', getById);
 router.post('/', bodyParser(), createArticle);
-router.put('/:id[0-9]{1,}', updateArticle);
-router.delete('/:id[0-9]{1,}', deleteArticle);
+router.put('/:id([0-9]{1,})', updateArticle);
+router.delete('/:id([0-9]{1,})', deleteArticle);
 
 export { router };
