@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import Router, { RouterContext } from 'koa-router';
 import bodyParser from 'koa-bodyparser';
+import * as model from '../models/articles.model';
 
 const router = new Router({
   prefix: '/api/v1/articles',
@@ -16,31 +17,37 @@ const articles = [
 ];
 
 const getAll = async (ctx: RouterContext, next: any) => {
+  const articles = await model.getAll();
+
   ctx.body = articles;
+
   await next();
 };
 
 const getById = async (ctx: RouterContext, next: any) => {
-  const id = ctx.params.id;
-  const article = articles.find((article) => article.id === parseInt(id));
-  if (article) {
-    ctx.body = article;
+  let id = ctx.params.id;
+  let articles = await model.getById(parseInt(id));
+
+  if (articles?.length > 0) {
+    ctx.body = articles[0];
   } else {
     ctx.status = 404;
-    ctx.body = { err: 'No such article existed' };
   }
 
   await next();
 };
 
 const createArticle = async (ctx: RouterContext, next: any) => {
-  const { title, fullText } = ctx.request.body as { title: string; fullText: string };
-  const newArticle = { id: articles.length + 1, title, fullText };
-  articles.push(newArticle);
+  const body = ctx.request.body;
+  const result = await model.add(body);
 
-  ctx.status = 201;
-  ctx.body = articles;
-  await next();
+  if (result.status === 201) {
+    ctx.status = 201;
+    ctx.body = body;
+  } else {
+    ctx.status = 500;
+    ctx.body = { err: 'insert data failed' };
+  }
 };
 
 const updateArticle = async (ctx: RouterContext, next: any) => {
